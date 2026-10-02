@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOURCE_URL='https://gist.githubusercontent.com/Cupidzp/a265f812c2f3529c3e04e0d1d0ecbac5/raw/0353331d5884512896956dfd4240050f8b054ad1/S5'
+REPO_SCRIPT_URL='https://raw.githubusercontent.com/Cupidzp/socks5-one-click/main/S5'
+
+tmp_script="$(mktemp)"
+trap 'rm -f "$tmp_script"' EXIT
+
+if command -v curl >/dev/null 2>&1; then
+    curl --fail --location --silent --show-error --retry 3 --connect-timeout 10 --max-time 120 "$SOURCE_URL" -o "$tmp_script"
+elif command -v wget >/dev/null 2>&1; then
+    wget --quiet --timeout=120 -O "$tmp_script" "$SOURCE_URL"
+else
+    echo '错误：需要 curl 或 wget 才能下载部署脚本。' >&2
+    exit 1
+fi
+
+if [[ ! -s "$tmp_script" ]]; then
+    echo '错误：部署脚本下载失败或内容为空。' >&2
+    exit 1
+fi
+
+sed -i "s|https://gist.githubusercontent.com/Puthsent/36817edc52867fd74559fde96339af99/raw/S5|${REPO_SCRIPT_URL}|g" "$tmp_script"
+sed -i 's|DEFAULT_PASS="123456789"|DEFAULT_PASS="$(head -c 128 /dev/urandom | tr -dc "A-Za-z0-9" | head -c 24)"|' "$tmp_script"
+
+bash "$tmp_script" "$@"
