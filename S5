@@ -3,6 +3,7 @@ set -euo pipefail
 
 # Puthsent upstream revision containing Gost v3.3.0 support.
 SOURCE_URL='https://gist.githubusercontent.com/Puthsent/36817edc52867fd74559fde96339af99/raw/adb37dc0fddee696944b38f921ae4c0f12736c77/S5'
+REPO_SCRIPT_URL='https://raw.githubusercontent.com/Cupidzp/socks5-one-click/main/S5'
 
 tmp_script="$(mktemp)"
 trap 'rm -f "$tmp_script"' EXIT
@@ -29,6 +30,20 @@ fi
 
 if [[ "$(head -n 1 "$tmp_script")" != '#!/usr/bin/env bash' ]]; then
     echo '错误：下载内容不是预期的 Bash 脚本。' >&2
+    exit 1
+fi
+
+# Some containers hide process ownership in ss; fall back to the listening port.
+sed -i '/netstat -lntup 2>\/dev\/null | awk -v p=/i\    elif command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then printf 运行中' "$tmp_script"
+# Route the manager's updater through this checked launcher as well.
+sed -i "s|https://gist.githubusercontent.com/Puthsent/36817edc52867fd74559fde96339af99/raw/S5|${REPO_SCRIPT_URL}|g" "$tmp_script"
+
+if ! grep -qF 'ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"' "$tmp_script"; then
+    echo '错误：无法安装监听端口状态检测修复。' >&2
+    exit 1
+fi
+if ! grep -qF "$REPO_SCRIPT_URL" "$tmp_script"; then
+    echo '错误：无法配置仓库更新入口。' >&2
     exit 1
 fi
 
