@@ -33,13 +33,17 @@ if [[ "$(head -n 1 "$tmp_script")" != '#!/usr/bin/env bash' ]]; then
     exit 1
 fi
 
-# Some containers hide process ownership in ss; fall back to the listening port.
-sed -i '/netstat -lntup 2>\/dev\/null | awk -v p=/i\    elif command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then printf 运行中' "$tmp_script"
-# Route the manager's updater through this checked launcher as well.
+# Port-based checks work when restricted containers hide process ownership in ss.
+sed -i '691c\    elif command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then' "$tmp_script"
+sed -i '693c\    elif command -v netstat >/dev/null 2>&1 && netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then' "$tmp_script"
 sed -i "s|https://gist.githubusercontent.com/Puthsent/36817edc52867fd74559fde96339af99/raw/S5|${REPO_SCRIPT_URL}|g" "$tmp_script"
 
 if ! grep -qF 'ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"' "$tmp_script"; then
     echo '错误：无法安装监听端口状态检测修复。' >&2
+    exit 1
+fi
+if ! grep -qF 'netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"' "$tmp_script"; then
+    echo '错误：无法安装 netstat 状态检测修复。' >&2
     exit 1
 fi
 if ! grep -qF "$REPO_SCRIPT_URL" "$tmp_script"; then
