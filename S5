@@ -36,6 +36,7 @@ fi
 # Port-based checks work when restricted containers hide process ownership in ss.
 sed -i '691c\    elif command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then' "$tmp_script"
 sed -i '693c\    elif command -v netstat >/dev/null 2>&1 && netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then' "$tmp_script"
+# BusyBox mktemp requires the XXXXXX template at the end; file contents determine the format.
 sed -i '1400c\        gost_archive=$(mktemp "$gost_dir/gost.XXXXXX") || exit 1' "$tmp_script"
 sed -i '1524c\        if command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then is_running=1; break; fi' "$tmp_script"
 sed -i '1525c\        if command -v netstat >/dev/null 2>&1 && netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then is_running=1; break; fi' "$tmp_script"
