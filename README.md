@@ -8,7 +8,7 @@
 curl -fsSL https://raw.githubusercontent.com/Cupidzp/socks5-one-click/main/S5 | sudo bash
 ```
 
-仓库中的 `S5` 会下载固定版本的上游管理脚本，校验 Bash shebang 并运行 `bash -n` 后才执行。状态面板按监听端口判断用户是否运行，不依赖受限容器可能缺失的进程归属信息。
+仓库中的 `S5` 会下载固定版本的上游管理脚本，校验 Bash shebang 并运行 `bash -n` 后才执行。主面板和用户列表均按监听端口判断状态，不依赖受限容器可能缺失的进程归属信息。
 
 ## 上游与版本
 

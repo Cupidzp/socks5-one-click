@@ -36,6 +36,8 @@ fi
 # Port-based checks work when restricted containers hide process ownership in ss.
 sed -i '691c\    elif command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then' "$tmp_script"
 sed -i '693c\    elif command -v netstat >/dev/null 2>&1 && netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then' "$tmp_script"
+sed -i '1524c\        if command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then is_running=1; break; fi' "$tmp_script"
+sed -i '1525c\        if command -v netstat >/dev/null 2>&1 && netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then is_running=1; break; fi' "$tmp_script"
 sed -i "s|https://gist.githubusercontent.com/Puthsent/36817edc52867fd74559fde96339af99/raw/S5|${REPO_SCRIPT_URL}|g" "$tmp_script"
 
 if ! grep -qF 'ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"' "$tmp_script"; then
@@ -44,6 +46,10 @@ if ! grep -qF 'ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"' "$tm
 fi
 if ! grep -qF 'netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"' "$tmp_script"; then
     echo '错误：无法安装 netstat 状态检测修复。' >&2
+    exit 1
+fi
+if ! grep -qF 'ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then is_running=1' "$tmp_script"; then
+    echo '错误：无法安装主面板监听状态修复。' >&2
     exit 1
 fi
 if ! grep -qF "$REPO_SCRIPT_URL" "$tmp_script"; then
