@@ -36,16 +36,22 @@ fi
 # Port-based checks work when restricted containers hide process ownership in ss.
 sed -i '691c\    elif command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then' "$tmp_script"
 sed -i '693c\    elif command -v netstat >/dev/null 2>&1 && netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then' "$tmp_script"
+sed -i '1400c\        gost_archive=$(mktemp "$gost_dir/gost.XXXXXX") || exit 1' "$tmp_script"
 sed -i '1524c\        if command -v ss >/dev/null 2>&1 && ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then is_running=1; break; fi' "$tmp_script"
 sed -i '1525c\        if command -v netstat >/dev/null 2>&1 && netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then is_running=1; break; fi' "$tmp_script"
+sed -i '1691c\    local temp_script; temp_script=$(mktemp "$update_dir/update.XXXXXX") || return' "$tmp_script"
 sed -i "s|https://gist.githubusercontent.com/Puthsent/36817edc52867fd74559fde96339af99/raw/S5|${REPO_SCRIPT_URL}|g" "$tmp_script"
 
 if ! grep -qF 'ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"' "$tmp_script"; then
     echo '错误：无法安装监听端口状态检测修复。' >&2
     exit 1
 fi
-if ! grep -qF 'netstat -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"' "$tmp_script"; then
-    echo '错误：无法安装 netstat 状态检测修复。' >&2
+if ! grep -qF 'gost_archive=$(mktemp "$gost_dir/gost.XXXXXX")' "$tmp_script"; then
+    echo '错误：无法安装 BusyBox mktemp 兼容修复。' >&2
+    exit 1
+fi
+if ! grep -qF 'temp_script=$(mktemp "$update_dir/update.XXXXXX")' "$tmp_script"; then
+    echo '错误：无法安装更新临时文件修复。' >&2
     exit 1
 fi
 if ! grep -qF 'ss -lnt 2>/dev/null | grep -qE "[:.]${port}([[:space:]]|$)"; then is_running=1' "$tmp_script"; then

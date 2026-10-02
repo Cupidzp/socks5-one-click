@@ -8,7 +8,7 @@
 curl -fsSL https://raw.githubusercontent.com/Cupidzp/socks5-one-click/main/S5 | sudo bash
 ```
 
-仓库中的 `S5` 会下载固定版本的上游管理脚本，校验 Bash shebang 并运行 `bash -n` 后才执行。主面板和用户列表均按监听端口判断状态，不依赖受限容器可能缺失的进程归属信息。
+仓库中的 `S5` 会下载固定版本的上游管理脚本，校验 Bash shebang 并运行 `bash -n` 后才执行。它兼容 BusyBox `mktemp`，并修正受限容器中主面板和用户列表的端口状态误报。
 
 ## 上游与版本
 
@@ -17,4 +17,4 @@ curl -fsSL https://raw.githubusercontent.com/Cupidzp/socks5-one-click/main/S5 | 
 - Gost 核心：`go-gost/gost v3.3.0`；上游按内置 SHA-256 校验下载包。
 - 初次配置会生成随机默认密码；管理面板提供多用户、独立端口及服务运维功能。
 
-面板在线更新会回到本仓库启动器，因此保留语法检查和状态探测修复。
+面板在线更新会回到本仓库启动器，因此保留语法检查、状态探测和 BusyBox 兼容修复。
